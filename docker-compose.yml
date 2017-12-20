@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+
+  db01:
+    build: ./db01
+    image: yuttasakcom/mariadb-master:10.2.11
+    container_name: db01
+    volumes:
+      - ./db01/db:/var/lib/mysql:rw
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+    ports:
+      - "3306:3306"
+    restart: always
+
+  db02:
+    build: ./db02
+    image: yuttasakcom/mariadb-slave:10.2.11
+    container_name: db02
+    volumes:
+      - ./db02/db:/var/lib/mysql:rw
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+    ports:
+      - "3307:3307"
+    restart: always
+
+  pa1:
+    image: phpmyadmin/phpmyadmin:4.7.4-1
+    ports:
+      - "8088:80"
+    links:
+      - db01:db
+    restart: always
+
+  pa2:
+    image: phpmyadmin/phpmyadmin:4.7.4-1
+    ports:
+      - "8089:80"
+    links:
+      - db02:db
+    restart: always
